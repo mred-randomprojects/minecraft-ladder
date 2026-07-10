@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Minecraft Ladder</title>
+<meta name="description" content="A step-by-step Minecraft progression guide across 7 parallel skill trees — tick the rungs and track your journey. Progress saves locally in your browser.">
+<meta name="theme-color" content="#5faf3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MC Ladder">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<style>
+  :root {
+    /* light theme (default) — warm sandstone */
+    --bg: #ded8c7;
+    --panel: #f2eee2;
+    --panel-2: #e5dfcd;
+    --border: #c6bda6;
+    --text: #2b2820;
+    --muted: #756c58;
+    --link: #147a72;
+    --grass: #4f9a2f;
+    --grass-dark: #3a7322;
+    --gold: #c99a1f;
+    --shadow: rgba(80,70,40,.18);
+    --node: #c6bda6;
+    --accent: var(--grass);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171820;
+      --panel: #23242e;
+      --panel-2: #2d2e3a;
+      --border: #101019;
+      --text: #e9e9ef;
+      --muted: #9a9aab;
+      --link: #4fd6cf;
+      --grass: #5faf3a;
+      --grass-dark: #3f7a26;
+      --gold: #f2c14e;
+      --shadow: rgba(0,0,0,.45);
+      --node: #2d2e3a;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ded8c7; --panel: #f2eee2; --panel-2: #e5dfcd; --border: #c6bda6;
+    --text: #2b2820; --muted: #756c58; --link: #147a72;
+    --grass: #4f9a2f; --grass-dark: #3a7322; --gold: #c99a1f; --shadow: rgba(80,70,40,.18); --node: #c6bda6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #171820; --panel: #23242e; --panel-2: #2d2e3a; --border: #101019;
+    --text: #e9e9ef; --muted: #9a9aab; --link: #4fd6cf;
+    --grass: #5faf3a; --grass-dark: #3f7a26; --gold: #f2c14e; --shadow: rgba(0,0,0,.45); --node: #2d2e3a;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .label-caps { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 700; }
+
+  header {
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.32) 100%),
+      repeating-linear-gradient(90deg, var(--grass) 0 30px, var(--grass-dark) 30px 60px);
+    border-bottom: 4px solid var(--grass-dark);
+    padding: 24px 18px 26px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0; color: #fff; font-size: 26px; font-weight: 800;
+    letter-spacing: .5px; text-shadow: 2px 2px 0 rgba(0,0,0,.4); text-wrap: balance;
+  }
+  header p {
+    margin: 8px auto 0; max-width: 34em; color: #f2fbe9; font-size: 13px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.35);
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px 14px 72px; }
+
+  .overall {
+    background: var(--panel); border: 2px solid var(--border); border-radius: 10px;
+    padding: 12px 15px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .overall .bar-track { flex: 1 1 200px; }
+  .overall .cap { color: var(--muted); margin-bottom: 6px; }
+  .reset-btn {
+    background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .reset-btn:active { transform: translateY(1px); }
+  .reset-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  .tip {
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    border-radius: 8px; padding: 10px 13px; font-size: 12.5px; margin-bottom: 16px;
+    color: color-mix(in srgb, var(--gold) 78%, var(--text));
+  }
+
+  .tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tab {
+    background: var(--panel); border: 2px solid var(--border); border-radius: 8px;
+    padding: 8px 11px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--muted);
+    display: flex; align-items: center; gap: 7px; user-select: none;
+  }
+  .tab .emoji { font-size: 15px; }
+  .tab:active { transform: translateY(1px); }
+  .tab:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  .tab.active { color: var(--text); border-color: var(--tab-accent); background: var(--panel-2); }
+  .tab .mini {
+    font-variant-numeric: tabular-nums; font-size: 11px;
+    background: var(--border); padding: 1px 7px; border-radius: 10px; color: var(--muted);
+  }
+  .tab.active .mini { color: var(--tab-accent); background: color-mix(in srgb, var(--tab-accent) 18%, transparent); }
+
+  .tree-intro {
+    background: var(--panel); border-left: 5px solid var(--accent); border-radius: 8px;
+    padding: 13px 16px; margin-bottom: 16px;
+  }
+  .tree-intro h2 { margin: 0 0 5px; font-size: 18px; text-wrap: balance; }
+  .tree-intro p { margin: 0; color: var(--muted); font-size: 13.5px; }
+
+  .tree-progress { margin: 2px 0 16px; }
+  .tree-progress .cap { display: flex; justify-content: space-between; color: var(--muted); margin-bottom: 5px; }
+
+  .ladder { position: relative; padding-left: 30px; }
+  .ladder::before {
+    content: ""; position: absolute; left: 11px; top: 10px; bottom: 10px;
+    width: 4px; background: var(--panel-2); border-radius: 2px;
+  }
+  .step {
+    background: var(--panel); border: 2px solid var(--border); border-radius: 10px;
+    margin-bottom: 11px; padding: 13px 15px; position: relative;
+    box-shadow: 0 2px 6px var(--shadow);
+  }
+  .step::before {
+    content: ""; position: absolute; left: -24px; top: 19px;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--node); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--node);
+  }
+  .step.done::before { background: var(--grass); box-shadow: 0 0 0 2px var(--grass); }
+  .step.done { border-color: var(--grass-dark); }
+
+  .step-head { display: flex; align-items: flex-start; gap: 11px; }
+  .step-check {
+    appearance: none; -webkit-appearance: none;
+    min-width: 24px; width: 24px; height: 24px; margin: 2px 0 0;
+    border: 2px solid var(--muted); border-radius: 5px; background: var(--bg);
+    cursor: pointer; position: relative;
+  }
+  .step-check:checked { background: var(--grass); border-color: var(--grass); }
+  .step-check:checked::after {
+    content: "✔"; position: absolute; top: -1px; left: 4px; color: #fff; font-size: 15px; font-weight: bold;
+  }
+  .step-check:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  .step-title-row { flex: 1; min-width: 0; }
+  .step-title {
+    margin: 0; font-size: 15.5px; font-weight: 700;
+    display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  }
+  .step.done .step-title { text-decoration: line-through; color: var(--muted); }
+  .step-icon { font-size: 17px; }
+  .step-num {
+    font-variant-numeric: tabular-nums; color: var(--muted);
+    background: var(--panel-2); border-radius: 6px; padding: 1px 7px;
+    text-transform: uppercase; letter-spacing: .08em; font-size: 10.5px; font-weight: 700;
+  }
+  .step-desc { margin: 7px 0 0; font-size: 13.5px; color: var(--text); opacity: .92; }
+  .step-links { margin-top: 8px; }
+  .step-links a {
+    font-size: 12px; font-weight: 600; color: var(--link); text-decoration: none;
+    border-bottom: 1px dotted var(--link);
+  }
+  .step-links a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  .subtasks { display: flex; flex-direction: column; gap: 2px; margin: 11px 0 0 35px; }
+  .sub { display: flex; align-items: flex-start; gap: 9px; padding: 4px 0; font-size: 13px; cursor: pointer; }
+  .sub-check {
+    appearance: none; -webkit-appearance: none;
+    min-width: 18px; width: 18px; height: 18px; margin: 1px 0 0;
+    border: 2px solid var(--muted); border-radius: 4px; background: var(--bg);
+    cursor: pointer; position: relative;
+  }
+  .sub-check:checked { background: var(--grass-dark); border-color: var(--grass-dark); }
+  .sub-check:checked::after {
+    content: "✔"; position: absolute; top: -3px; left: 2px; color: #fff; font-size: 12px; font-weight: bold;
+  }
+  .sub-check:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  .sub.done .sub-label { text-decoration: line-through; color: var(--muted); }
+  .sub-label { color: var(--text); opacity: .9; }
+
+  .bar-outer {
+    background: var(--border); border-radius: 20px; height: 13px; overflow: hidden;
+  }
+  .bar-inner { height: 100%; width: 0; border-radius: 20px; transition: width .35s ease; }
+  .cap { font-size: 12px; }
+
+  footer { text-align: center; color: var(--muted); font-size: 11.5px; padding: 22px 16px 36px; }
+  footer a { color: var(--link); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⛏️ The Minecraft Ladder</h1>
+  <p>A step-by-step progression guide — climb the trees, tick the rungs, explore the game at your own pace.</p>
+</header>
+
+<div class="wrap">
+  <div class="overall">
+    <div class="bar-track">
+      <div class="cap label-caps">Overall — <span id="overall-count">0 / 0</span></div>
+      <div class="bar-outer"><div class="bar-inner" id="overall-bar" style="background:linear-gradient(90deg,var(--gold),#ffe08a)"></div></div>
+    </div>
+    <button class="reset-btn" id="reset-btn">Reset progress</button>
+  </div>
+
+  <div class="tip">
+    💡 Your ticks save automatically in this browser. Bookmark this page to come back to them. The <b>Main Quest</b> is the backbone — the other trees are parallel side-goals you can chase in any order.
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="tree-intro" id="tree-intro"></div>
+
+  <div class="tree-progress">
+    <div class="cap label-caps"><span>This tree</span><span id="tree-count">0 / 0</span></div>
+    <div class="bar-outer"><div class="bar-inner" id="tree-bar"></div></div>
+  </div>
+
+  <div class="ladder" id="ladder"></div>
+</div>
+
+<footer>
+  A personal exploration guide · Links open the official <a href="https://minecraft.wiki" target="_blank" rel="noopener">Minecraft Wiki</a> · Java/Bedrock 1.20+
+</footer>
+
+<script>
+const WIKI = (t) => "https://minecraft.wiki/w/" + t;
+
+const TREES = [
+  {
+    id: "main", name: "Main Quest", emoji: "🐉", color: "#5faf3a",
+    intro: "The canonical path from punching your first tree to slaying the Ender Dragon. If you follow only one ladder, follow this one — everything else supports it.",
+    steps: [
+      { icon:"🪵", title:"Punch trees for wood", wiki:"Log",
+        desc:"Hold to break a tree trunk and collect logs. Turn logs into planks in your inventory grid. Aim for about a stack early on.",
+        sub:["Collect ~1 stack of logs","Convert logs → planks","Craft 4 sticks"] },
+      { icon:"🛠️", title:"Craft a Crafting Table", wiki:"Crafting_Table",
+        desc:"4 planks in a 2×2 grid makes a crafting table — it unlocks the full 3×3 grid needed for tools, armor, and nearly everything else." },
+      { icon:"⛏️", title:"Make wooden tools", wiki:"Pickaxe",
+        desc:"Craft a wooden pickaxe (plus axe and sword). The pickaxe lets you mine stone — you can't mine stone with your hand.",
+        sub:["Wooden pickaxe","Wooden axe","Wooden sword"] },
+      { icon:"🪨", title:"Mine stone → stone tools", wiki:"Cobblestone",
+        desc:"Mine cobblestone with the wooden pickaxe, then upgrade every tool to stone — faster and longer-lasting." },
+      { icon:"🔥", title:"Get coal & make torches", wiki:"Torch",
+        desc:"Coal ore shows as black flecks in stone. 1 coal + 1 stick = 4 torches. Torches stop mobs spawning and light your way.",
+        sub:["Mine some coal ore","Craft a stack of torches"] },
+      { icon:"🛏️", title:"Survive the first night", wiki:"Bed",
+        desc:"Before dark, dig into a hillside or wall yourself in. Kill 3 sheep for wool, add planks, and craft a bed — sleeping skips night and sets your spawn.",
+        sub:["Build/dig a safe shelter","Craft a bed","Sleep to set spawn"] },
+      { icon:"🍖", title:"Secure food", wiki:"Hunger",
+        desc:"Kill cows, pigs or chickens for raw meat and cook it in a furnace. Keep the hunger bar up so health regenerates." },
+      { icon:"⚙️", title:"Build a furnace & smelt iron", wiki:"Iron_Ingot",
+        desc:"8 cobblestone = a furnace. Mine iron ore (needs a stone pickaxe) and smelt it into ingots using coal as fuel.",
+        sub:["Craft a furnace","Mine 6+ iron ore","Smelt into ingots"] },
+      { icon:"🗡️", title:"Iron tools & armor", wiki:"Armor",
+        desc:"Upgrade your pickaxe and sword and craft a full iron armor set. This is your first serious survival kit." },
+      { icon:"💎", title:"Find diamonds", wiki:"Diamond",
+        desc:"Diamonds spawn deep (around Y = -58 in modern versions). Dig down carefully, watch for lava, and mine the ore with an IRON pickaxe or better.",
+        sub:["Reach deep caves / Y ≈ -58","Mine 3+ diamonds with an iron pickaxe"] },
+      { icon:"⚔️", title:"Diamond gear", wiki:"Diamond",
+        desc:"Craft a diamond pickaxe (needed to mine obsidian) and ideally a diamond sword and armor set." },
+      { icon:"📖", title:"Set up enchanting", wiki:"Enchanting_Table",
+        desc:"Craft an enchanting table (obsidian + diamonds + book) and ring it with bookshelves for higher-level enchants. Spend mining/mob XP on your gear.",
+        sub:["Craft an enchanting table","Place 15 bookshelves around it","Enchant your gear"] },
+      { icon:"🌀", title:"Build a Nether portal", wiki:"Nether_Portal",
+        desc:"Get obsidian (pour water onto lava, mine with a diamond pickaxe) and build a 4×5 frame. Light it with flint & steel.",
+        sub:["Gather 10+ obsidian","Build the frame","Craft flint & steel and light it"] },
+      { icon:"🔥", title:"Gather blaze rods", wiki:"Blaze_Rod",
+        desc:"Find a Nether Fortress, locate a blaze spawner, and kill blazes for rods. Grind rods into blaze powder for eyes of ender and potions.",
+        sub:["Find a Nether Fortress","Collect 6+ blaze rods"] },
+      { icon:"👁️", title:"Craft Eyes of Ender", wiki:"Eye_of_Ender",
+        desc:"Kill Endermen in the Overworld for ender pearls, combine with blaze powder into eyes of ender. Make at least 12–15.",
+        sub:["Collect 12+ ender pearls","Craft 12+ eyes of ender"] },
+      { icon:"🏰", title:"Find the Stronghold", wiki:"Stronghold",
+        desc:"Throw an eye of ender — it floats toward the nearest stronghold. Follow the trail, dig down, and find the End Portal room." },
+      { icon:"🌌", title:"Activate the End Portal", wiki:"End_Portal",
+        desc:"Fill each of the 12 frame blocks with an eye of ender to open the gateway to The End." },
+      { icon:"🐉", title:"Defeat the Ender Dragon", wiki:"Ender_Dragon",
+        desc:"Shoot out the End Crystals on the obsidian pillars (bring a bow), then attack the dragon's head. Beating it 'completes' the game and opens the End gateways.",
+        sub:["Destroy all End Crystals","Kill the dragon","Grab the dragon egg (optional trophy)"] },
+    ]
+  },
+  {
+    id: "gear", name: "Gearing Up", emoji: "🛡️", color: "#8a8f98",
+    intro: "The combat & survivability ladder — from a leather cap to a fully enchanted netherite kit that can take a hit and keep swinging.",
+    steps: [
+      { icon:"🧥", title:"Leather armor", wiki:"Leather", desc:"Kill cows for leather and craft your first armor. Weak, but better than bare skin against early mobs." },
+      { icon:"🪖", title:"Full iron armor set", wiki:"Armor", desc:"Helmet, chestplate, leggings, boots — 24 iron for the full set. Your standard mid-game defense." },
+      { icon:"🛡️", title:"Craft a shield", wiki:"Shield", desc:"6 planks + 1 iron. Right-click (or hold) to block melee hits and arrows — a huge damage cut." },
+      { icon:"🏹", title:"Bow & arrows", wiki:"Bow", desc:"Bow = 3 sticks + 3 string; arrows = flint + stick + feather. Essential for ranged fights, especially the dragon.",
+        sub:["Craft a bow","Stock up on arrows"] },
+      { icon:"✨", title:"Enchant your gear", wiki:"Enchanting", desc:"Prioritise Protection on armor, Sharpness on swords, Efficiency + Unbreaking + Fortune on tools, Power/Infinity on bows.",
+        sub:["Protection on armor","Sharpness on a sword","Unbreaking on tools"] },
+      { icon:"💎", title:"Diamond armor set", wiki:"Diamond", desc:"Full diamond armor (24 diamonds). With Protection enchants this carries you through the End." },
+      { icon:"🧪", title:"Combat potions", wiki:"Potion", desc:"With a brewing stand (needs a blaze rod), brew Healing, Regeneration, Strength and Fire Resistance. Fire Res is vital in the Nether.",
+        sub:["Craft a brewing stand","Brew Fire Resistance","Brew Healing/Regen"] },
+      { icon:"🪙", title:"Netherite upgrade", wiki:"Netherite_Ingot", desc:"Mine Ancient Debris in the Nether (Y ≈ 15; blast with beds/TNT). Smelt to scrap, combine with gold → netherite ingot, then upgrade diamond gear at a smithing table.",
+        sub:["Find 4+ Ancient Debris","Craft a netherite ingot","Upgrade a tool or armor piece"] },
+      { icon:"🌟", title:"Totem of Undying", wiki:"Totem_of_Undying", desc:"Drops from Evokers (Woodland Mansions & raids). Held in your off-hand, it revives you from a lethal hit — the ultimate safety net." },
+    ]
+  },
+  {
+    id: "farm", name: "Food & Farming", emoji: "🌾", color: "#c9a227",
+    intro: "Never starve again. From hunting animals to self-sustaining farms and villager trade empires.",
+    steps: [
+      { icon:"🌱", title:"Plant a wheat farm", wiki:"Wheat", desc:"Hoe dirt near water, plant seeds (from breaking grass), wait until golden, harvest. Bread = 3 wheat.",
+        sub:["Till soil next to water","Plant seeds","Harvest & craft bread"] },
+      { icon:"🐄", title:"Breed animals", wiki:"Breeding", desc:"Feed two of the same animal their food (wheat for cows/sheep, seeds for chickens) to make babies — renewable meat, leather and wool.",
+        sub:["Build a pen","Breed cows or sheep","Breed chickens"] },
+      { icon:"🥕", title:"Crop variety", wiki:"Crops", desc:"Add carrots, potatoes (from villages) and beetroot. Potatoes and carrots are excellent steady food." },
+      { icon:"🐝", title:"Bees & honey", wiki:"Bee", desc:"Find a bee nest, place a campfire under it to calm the bees, then harvest honeycomb (waxes copper) and honey bottles (food + cures poison)." },
+      { icon:"💠", title:"Trade with villagers", wiki:"Trading", desc:"Find and protect a village, then trade for emeralds. Farmer, Librarian (enchanted books!) and Cleric are top priorities.",
+        sub:["Find a village","Make your first trade","Get an enchanted book from a librarian"] },
+      { icon:"🤖", title:"Automatic crop farm", wiki:"Tutorials/Crop_farming", desc:"Use water streams or villager farmers to auto-harvest crops into a hopper and chest — no more hand-farming." },
+      { icon:"🍎", title:"Enchanted golden apple", wiki:"Enchanted_Golden_Apple", desc:"8 gold blocks + 1 apple. This 'god apple' gives massive regen and resistance — a clutch item for tough fights. Keep a few." },
+      { icon:"🌋", title:"Nether wart farm", wiki:"Nether_Wart", desc:"Grab nether wart from a fortress and plant it on soul sand. It's the base ingredient for every useful potion." },
+    ]
+  },
+  {
+    id: "explore", name: "Exploration", emoji: "🧭", color: "#4fa3d1",
+    intro: "The world is full of generated structures with unique loot and dangers. A checklist of places worth finding — from a sleepy village to the terrifying Ancient City.",
+    steps: [
+      { icon:"🏘️", title:"Visit a Village", wiki:"Village", desc:"Free crops, beds, chests and villagers to trade with — often the best early upgrade you'll find." },
+      { icon:"🏜️", title:"Raid a Desert Pyramid", wiki:"Desert_Pyramid", desc:"Loot chests sit above a pressure-plate TNT trap — break in from the side or disarm it first. Good early loot." },
+      { icon:"⚓", title:"Ocean: shipwreck & treasure", wiki:"Shipwreck", desc:"Shipwrecks hold treasure maps leading to buried treasure — often a Heart of the Sea for a conduit.",
+        sub:["Find a shipwreck","Follow a treasure map","Dig up buried treasure"] },
+      { icon:"🌊", title:"Ocean Monument", wiki:"Ocean_Monument", desc:"Guardian-infested underwater temple with sponges, gold blocks and Elder Guardians. Bring water breathing + night vision." },
+      { icon:"🏚️", title:"Woodland Mansion", wiki:"Woodland_Mansion", desc:"A huge, rare forest mansion full of Illagers — including Evokers that drop the Totem of Undying. A Cartographer's map points the way." },
+      { icon:"⚔️", title:"Survive a Raid", wiki:"Raid", desc:"Kill a Pillager captain for 'Bad Omen', then enter a village to trigger a raid. Win every wave for the 'Hero of the Village' discount buff." },
+      { icon:"🗿", title:"Ancient City (Deep Dark)", wiki:"Ancient_City", desc:"A deep underground biome with incredible loot — but home to the Warden, a blind one-shot monster that senses vibration. Sneak; don't fight.",
+        sub:["Find a Deep Dark biome","Loot an Ancient City chest","Escape without waking the Warden"] },
+      { icon:"🏺", title:"Archaeology / Trail Ruins", wiki:"Trail_Ruins", desc:"Brush suspicious sand and gravel to excavate pottery sherds and rare templates — a quieter collector's side-goal." },
+    ]
+  },
+  {
+    id: "redstone", name: "Redstone & Building", emoji: "🔴", color: "#b0413e",
+    intro: "The engineering ladder. Redstone is Minecraft's wiring — from a simple lever up to farms that run themselves while you're away.",
+    steps: [
+      { icon:"🔴", title:"Learn redstone basics", wiki:"Redstone_Dust", desc:"Mine redstone ore, lay dust as 'wire', and power it with a lever, button or redstone torch. Everything else builds on this." },
+      { icon:"🚪", title:"Doors, pistons & dispensers", wiki:"Piston", desc:"Wire a lever to a piston or iron door. Pistons push blocks; dispensers shoot items — the building blocks of every contraption.",
+        sub:["Build a piston door","Set up a dispenser"] },
+      { icon:"⚙️", title:"Auto-smelter", wiki:"Hopper", desc:"Use hoppers to feed ore + fuel into a furnace and pull ingots out automatically — set-and-forget smelting." },
+      { icon:"💀", title:"Build a mob / XP farm", wiki:"Tutorials/Mob_farm", desc:"A dark chamber where mobs spawn, get funneled by water, and drop to a killing spot — endless XP plus string, bones and gunpowder.",
+        sub:["Build a spawn chamber","Funnel mobs to one spot","Collect XP and drops"] },
+      { icon:"🧲", title:"Item sorting system", wiki:"Hopper", desc:"Hopper-based sorters route each item type into its own labelled chest automatically — tames late-game inventory chaos." },
+      { icon:"🔩", title:"Iron golem farm", wiki:"Iron_Golem", desc:"Use villagers and a spawn platform to farm iron golems for renewable iron — no more mining it by hand." },
+      { icon:"💡", title:"Build something beautiful", wiki:"Tutorials/Building_a_house", desc:"Not everything is function. Design a base you actually want to live in — mix wood, stone, glass and lighting for atmosphere." },
+    ]
+  },
+  {
+    id: "nether", name: "The Nether", emoji: "🔥", color: "#d1603a",
+    intro: "A deeper dive into the hell dimension beyond the Main Quest's blaze rods — biomes, bartering, and the road to a Beacon.",
+    steps: [
+      { icon:"🌀", title:"Enter the Nether", wiki:"The_Nether", desc:"Step through a lit portal. Bring fire resistance, a bow, blocks to bridge, and don't wear gold near angry piglins… unless you want to trade." },
+      { icon:"🐷", title:"Barter with Piglins", wiki:"Piglin", desc:"Wear at least one gold armor piece, then drop or trade gold ingots. Piglins toss back random loot — ender pearls, obsidian, fire res potions.",
+        sub:["Wear a gold item","Trade 10+ gold ingots"] },
+      { icon:"🗺️", title:"Visit every Nether biome", wiki:"Biome", desc:"Crimson forest, warped forest, soul sand valley, basalt deltas and the nether wastes each have unique blocks and mobs.",
+        sub:["Crimson or warped forest","Soul sand valley","Basalt deltas"] },
+      { icon:"💀", title:"Farm Wither Skeleton skulls", wiki:"Wither_Skeleton", desc:"Wither skeletons spawn in fortresses. You need 3 of their (rare) skulls to summon the Wither boss.",
+        sub:["Kill wither skeletons","Collect 3 skulls"] },
+      { icon:"☠️", title:"Summon & defeat the Wither", wiki:"Wither", desc:"Build a T of 4 soul sand + 3 skulls to spawn the Wither — a dangerous flying boss. Fight it enclosed. It drops a Nether Star." },
+      { icon:"🔆", title:"Build a Beacon", wiki:"Beacon", desc:"Nether Star + glass + obsidian = a beacon. Place it on a pyramid of iron/gold/diamond/netherite blocks for permanent buffs (Haste, Speed…).",
+        sub:["Craft a beacon","Build the mineral pyramid","Activate a buff"] },
+    ]
+  },
+  {
+    id: "end", name: "Endgame & Beyond", emoji: "🌌", color: "#a988d6",
+    intro: "'Beating the dragon' is really the start of the endgame. The outer End islands hold Elytra wings and the game's best loot.",
+    steps: [
+      { icon:"🐉", title:"Defeat the Ender Dragon", wiki:"Ender_Dragon", desc:"The literal gateway to everything here. Once it's dead, an End Gateway portal appears leading to the outer islands." },
+      { icon:"🌉", title:"Reach the outer End islands", wiki:"End_Gateway", desc:"Throw an ender pearl through the small End Gateway to teleport out to where End Cities generate.",
+        sub:["Find an End Gateway","Pearl through to the outer islands"] },
+      { icon:"🏙️", title:"Loot an End City", wiki:"End_City", desc:"Tall purpur towers guarded by Shulkers (which levitate you — mind the ledges). Chests hold diamond/enchanted gear and iron.",
+        sub:["Find an End City","Defeat the Shulkers","Loot the chests"] },
+      { icon:"🪽", title:"Get the Elytra", wiki:"Elytra", desc:"Found on the End Ship by some End Cities, in an item frame near the bow. These wings let you glide — game-changing mobility.",
+        sub:["Find an End Ship","Grab the Elytra","Boost with fireworks"] },
+      { icon:"📦", title:"Craft Shulker Boxes", wiki:"Shulker_Box", desc:"Kill Shulkers for shells; 2 shells + a chest = a portable chest that keeps its contents when broken. Endgame storage upgrade.",
+        sub:["Collect 2 shulker shells","Craft a shulker box"] },
+      { icon:"🥚", title:"Respawn the dragon (optional)", wiki:"End_Crystal", desc:"Place 4 End Crystals around the exit portal to resummon the dragon for repeat fights, more dragon breath and XP." },
+      { icon:"🏆", title:"Complete the collection", wiki:"Advancements", desc:"Chase the full advancement tree — 'How Did We Get Here?' (every effect at once) and 'A Complete Catalogue' (all cats) are the ultimate flexes." },
+    ]
+  },
+];
+
+const STORAGE_KEY = "minecraft-ladder-v1";
+let state = loadState();
+let activeTree = TREES[0].id;
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch (e) { return {}; }
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+const keyStep = (tid, i) => tid + ":s" + i;
+const keySub = (tid, i, j) => tid + ":s" + i + ":sub" + j;
+
+function treeTotals(tree) {
+  let total = 0, done = 0;
+  tree.steps.forEach((s, i) => {
+    total++; if (state[keyStep(tree.id, i)]) done++;
+    if (s.sub) s.sub.forEach((_, j) => { total++; if (state[keySub(tree.id, i, j)]) done++; });
+  });
+  return { total, done };
+}
+
+function renderTabs() {
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  TREES.forEach(tree => {
+    const { total, done } = treeTotals(tree);
+    const t = document.createElement("button");
+    t.className = "tab" + (tree.id === activeTree ? " active" : "");
+    t.style.setProperty("--tab-accent", tree.color);
+    t.innerHTML = `<span class="emoji">${tree.emoji}</span> ${tree.name} <span class="mini">${done}/${total}</span>`;
+    t.onclick = () => { activeTree = tree.id; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    el.appendChild(t);
+  });
+}
+
+function renderTree() {
+  const tree = TREES.find(t => t.id === activeTree);
+  document.documentElement.style.setProperty("--accent", tree.color);
+
+  const intro = document.getElementById("tree-intro");
+  intro.style.borderLeftColor = tree.color;
+  intro.innerHTML = `<h2>${tree.emoji} ${tree.name}</h2><p>${tree.intro}</p>`;
+
+  const ladder = document.getElementById("ladder");
+  ladder.innerHTML = "";
+
+  tree.steps.forEach((s, i) => {
+    const stepDone = !!state[keyStep(tree.id, i)];
+    const step = document.createElement("div");
+    step.className = "step" + (stepDone ? " done" : "");
+
+    let subHTML = "";
+    if (s.sub && s.sub.length) {
+      subHTML = '<div class="subtasks">' + s.sub.map((label, j) => {
+        const sd = !!state[keySub(tree.id, i, j)];
+        return `<label class="sub${sd ? ' done' : ''}">
+          <input type="checkbox" class="sub-check" data-si="${i}" data-sj="${j}" ${sd ? 'checked' : ''}>
+          <span class="sub-label">${label}</span></label>`;
+      }).join("") + '</div>';
+    }
+    const link = s.wiki ? `<div class="step-links"><a href="${WIKI(s.wiki)}" target="_blank" rel="noopener">📖 Wiki reference →</a></div>` : "";
+
+    step.innerHTML = `
+      <div class="step-head">
+        <input type="checkbox" class="step-check" data-si="${i}" ${stepDone ? 'checked' : ''} aria-label="Complete step: ${s.title}">
+        <div class="step-title-row">
+          <p class="step-title"><span class="step-num">Step ${i + 1}</span> <span class="step-icon">${s.icon}</span> ${s.title}</p>
+          <p class="step-desc">${s.desc}</p>
+          ${link}
+        </div>
+      </div>${subHTML}`;
+    ladder.appendChild(step);
+  });
+
+  ladder.querySelectorAll(".step-check").forEach(cb => {
+    cb.onchange = () => { state[keyStep(tree.id, +cb.dataset.si)] = cb.checked; saveState(); renderAll(); };
+  });
+  ladder.querySelectorAll(".sub-check").forEach(cb => {
+    cb.onchange = () => { state[keySub(tree.id, +cb.dataset.si, +cb.dataset.sj)] = cb.checked; saveState(); renderAll(); };
+  });
+
+  const { total, done } = treeTotals(tree);
+  document.getElementById("tree-count").textContent = `${done} / ${total}`;
+  const tb = document.getElementById("tree-bar");
+  tb.style.width = (total ? done / total * 100 : 0) + "%";
+  tb.style.background = `linear-gradient(90deg, ${tree.color}bb, ${tree.color})`;
+}
+
+function renderOverall() {
+  let total = 0, done = 0;
+  TREES.forEach(tree => { const t = treeTotals(tree); total += t.total; done += t.done; });
+  document.getElementById("overall-count").textContent = `${done} / ${total}`;
+  document.getElementById("overall-bar").style.width = (total ? done / total * 100 : 0) + "%";
+}
+
+function renderAll() { renderTabs(); renderTree(); renderOverall(); }
+
+document.getElementById("reset-btn").onclick = () => {
+  if (confirm("Reset ALL progress across every tree? This can't be undone.")) {
+    state = {}; saveState(); renderAll();
+  }
+};
+
+renderAll();
+</script>
+
+</body>
+</html>

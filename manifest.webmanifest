@@ -1,0 +1,16 @@
+{
+  "name": "The Minecraft Ladder",
+  "short_name": "MC Ladder",
+  "description": "A step-by-step Minecraft progression guide across 7 parallel skill trees, with progress that saves on your device.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#171820",
+  "theme_color": "#5faf3a",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
