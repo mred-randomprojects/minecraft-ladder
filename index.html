@@ -204,6 +204,22 @@
   .bar-inner { height: 100%; width: 0; border-radius: 20px; transition: width .35s ease; }
   .cap { font-size: 12px; }
 
+  .detour {
+    margin: 12px 0 2px; padding: 10px 12px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+    border-radius: 8px; font-size: 12.5px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  }
+  .detour-txt { flex: 1 1 220px; color: var(--text); }
+  .detour-btn {
+    flex: 0 0 auto; cursor: pointer; font-weight: 700; font-size: 12px;
+    color: #fff; background: var(--accent); border: none;
+    border-radius: 6px; padding: 7px 12px; white-space: nowrap;
+  }
+  .detour-btn:active { transform: translateY(1px); }
+  .detour-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
   footer { text-align: center; color: var(--muted); font-size: 11.5px; padding: 22px 16px 36px; }
   footer a { color: var(--link); }
 
@@ -227,7 +243,7 @@
   </div>
 
   <div class="tip">
-    💡 Your ticks save automatically in this browser. Bookmark this page to come back to them. The <b>Main Quest</b> is the backbone — the other trees are parallel side-goals you can chase in any order.
+    💡 Your ticks save automatically in this browser — bookmark this page to keep them. The <b>Main Quest</b> is the backbone; the other trees are parallel goals you can chase in any order. Watch for <b>🔀 Detour</b> markers that hand you off to another tree at the right moment.
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -251,55 +267,59 @@ const WIKI = (t) => "https://minecraft.wiki/w/" + t;
 const TREES = [
   {
     id: "main", name: "Main Quest", emoji: "🐉", color: "#5faf3a",
-    intro: "The canonical path from punching your first tree to slaying the Ender Dragon. If you follow only one ladder, follow this one — everything else supports it.",
+    intro: "The canonical path from punching your first tree to slaying the Ender Dragon. If you follow only one ladder, follow this one — everything else supports it. Watch for 🔀 Detour markers that send you to another tree first.",
     steps: [
       { icon:"🪵", title:"Punch trees for wood", wiki:"Log",
-        desc:"Hold to break a tree trunk and collect logs. Turn logs into planks in your inventory grid. Aim for about a stack early on.",
-        sub:["Collect ~1 stack of logs","Convert logs → planks","Craft 4 sticks"] },
+        desc:"Hold attack on a tree to break logs. In your 2×2 inventory grid: 1 log → 4 planks, and 2 stacked planks → 4 sticks. Grab about 2 trees' worth.",
+        sub:["Collect ~20 logs","Make 20 planks","Make 8 sticks"] },
       { icon:"🛠️", title:"Craft a Crafting Table", wiki:"Crafting_Table",
-        desc:"4 planks in a 2×2 grid makes a crafting table — it unlocks the full 3×3 grid needed for tools, armor, and nearly everything else." },
+        desc:"4 planks in the 2×2 grid makes a crafting table. Place it to open the full 3×3 grid needed for tools, armor, and nearly everything else." },
       { icon:"⛏️", title:"Make wooden tools", wiki:"Pickaxe",
-        desc:"Craft a wooden pickaxe (plus axe and sword). The pickaxe lets you mine stone — you can't mine stone with your hand.",
+        desc:"At the table: pickaxe = 3 planks + 2 sticks, axe = 3 planks + 2 sticks, sword = 2 planks + 1 stick. The pickaxe is the key — you can't mine stone by hand.",
         sub:["Wooden pickaxe","Wooden axe","Wooden sword"] },
       { icon:"🪨", title:"Mine stone → stone tools", wiki:"Cobblestone",
-        desc:"Mine cobblestone with the wooden pickaxe, then upgrade every tool to stone — faster and longer-lasting." },
+        desc:"Mine ~20 cobblestone with the wooden pickaxe, then remake your pickaxe, axe and sword in stone — twice as fast and far more durable.",
+        sub:["Mine ~20 cobblestone","Stone pickaxe, axe & sword"] },
       { icon:"🔥", title:"Get coal & make torches", wiki:"Torch",
-        desc:"Coal ore shows as black flecks in stone. 1 coal + 1 stick = 4 torches. Torches stop mobs spawning and light your way.",
-        sub:["Mine some coal ore","Craft a stack of torches"] },
+        desc:"Coal ore shows as black flecks in stone (common in cliffs/caves). 1 coal + 1 stick = 4 torches. Torches stop mobs spawning and light your way.",
+        sub:["Mine ~10 coal ore","Craft ~40 torches"] },
       { icon:"🛏️", title:"Survive the first night", wiki:"Bed",
-        desc:"Before dark, dig into a hillside or wall yourself in. Kill 3 sheep for wool, add planks, and craft a bed — sleeping skips night and sets your spawn.",
-        sub:["Build/dig a safe shelter","Craft a bed","Sleep to set spawn"] },
+        desc:"Kill 3 sheep for 3 wool, then 3 wool + 3 planks = a bed. Wall off a small space or dig into a hillside. Sleeping skips the night AND sets your spawn point.",
+        sub:["Build/dig a safe shelter","Get 3 wool → craft a bed","Sleep to set your spawn"] },
       { icon:"🍖", title:"Secure food", wiki:"Hunger",
-        desc:"Kill cows, pigs or chickens for raw meat and cook it in a furnace. Keep the hunger bar up so health regenerates." },
+        desc:"Kill 3-4 cows, pigs or chickens and cook the raw meat in a furnace. Keep your hunger bar near full (18/20+) or health won't regenerate. Cooked meat and bread are your staples." },
       { icon:"⚙️", title:"Build a furnace & smelt iron", wiki:"Iron_Ingot",
-        desc:"8 cobblestone = a furnace. Mine iron ore (needs a stone pickaxe) and smelt it into ingots using coal as fuel.",
-        sub:["Craft a furnace","Mine 6+ iron ore","Smelt into ingots"] },
+        desc:"8 cobblestone = a furnace. Iron ore (tan flecks) needs a stone pickaxe — mine ~20. Smelt into ingots using coal as fuel (1 coal cooks 8 items).",
+        sub:["Craft a furnace","Mine ~20 iron ore","Smelt into ingots"] },
       { icon:"🗡️", title:"Iron tools & armor", wiki:"Armor",
-        desc:"Upgrade your pickaxe and sword and craft a full iron armor set. This is your first serious survival kit." },
-      { icon:"💎", title:"Mine diamonds (the efficient way)", wiki:"Diamond",
-        desc:"Diamonds are most common between <b>Y = -64 and -54</b>, so settle at <b>Y = -59</b>. Two good methods: <b>(1) explore</b> big caves, ravines and Deep Dark at that depth — open walls expose far more ore than digging blind; <b>(2) branch-mine</b> — one long 1×2 tunnel with side tunnels every 3 blocks (veins reach ~8 blocks, so 2-block gaps miss nothing). Carry a water bucket and never dig straight down — lava lakes are common here.<br><br><b>⭐ Key trick:</b> spend your first ~8 diamonds on an enchanting setup so you can put <b>Fortune III</b> on a pickaxe — it drops <b>2–4 diamonds per ore</b> instead of 1 (a bit more than double on average) and fixes the 'diamonds cost diamonds' problem. Add <b>Unbreaking III + Mending</b> so the pickaxe never breaks.",
-        sub:["Mine at Y = -59 (branch-mine or explore caves)","Get your first ~8 diamonds","Come back with a Fortune III pickaxe","Stockpile ~33 diamonds total"] },
+        desc:"Make an iron pickaxe (needed to mine diamonds), an iron sword, and a full iron armor set (24 ingots: helmet 5 · chest 8 · legs 7 · boots 4). Also craft a water bucket (3 iron) — you'll need water for diamonds and obsidian.",
+        sub:["Iron pickaxe + sword","Full iron armor (24 ingots)","Craft a water bucket"] },
+      { icon:"💎", title:"Mine your first diamonds", wiki:"Diamond",
+        desc:"Head to <b>Y = -59</b> (check coordinates: F3 on Java, or turn on 'Show Coordinates' on Bedrock). Branch-mine a 1×2 tunnel or explore caves at that depth. You only need your <b>first ~8 diamonds</b> now — enough for an enchanting table and a pickaxe. Carry a water bucket; never dig straight down (lava lakes are common here).",
+        sub:["Get to Y = -59","Mine your first ~8 diamonds"],
+        detour:{ tree:"enchant", text:"Diamonds 'cost diamonds' until you have Fortune. With those first ~8, jump to the Enchanting tree and work through to 'Enchant a Fortune III pickaxe' before mining more — it drops 2-4 diamonds per ore instead of 1." } },
+      { icon:"💠", title:"Stockpile diamonds with Fortune", wiki:"Fortune",
+        desc:"Back at <b>Y = -59</b> with a <b>Fortune III + Unbreaking III</b> pickaxe, mine until you have about <b>33 diamonds</b> — thanks to Fortune that's only ~12-15 ore. The grind now pays for itself.",
+        sub:["Have a Fortune III pickaxe","Mine up to ~33 diamonds total"] },
       { icon:"⚔️", title:"Craft your diamond kit", wiki:"Diamond",
-        desc:"Exact diamond costs: <b>pickaxe 3, sword 2, axe 3, shovel 1</b>, and full armor <b>24</b> (helmet 5 · chestplate 8 · leggings 7 · boots 4) — a complete set is about <b>33 diamonds</b>. Keep <b>2 spare</b> for the enchanting table next step. If you're short, buy pieces in this order of value: <b>pickaxe → sword → chestplate → leggings → helmet → boots</b>. Enchant everything before you head to the Nether.",
+        desc:"Exact costs: <b>pickaxe 3, sword 2, axe 3, shovel 1</b>, and full armor <b>24</b> (helmet 5 · chest 8 · legs 7 · boots 4) — a complete set is about <b>33 diamonds</b>. Keep <b>2 spare</b> for the enchanting table. Short on diamonds? Prioritise: <b>pickaxe → sword → chestplate → leggings → helmet → boots</b>.",
         sub:["Diamond pickaxe (3)","Diamond sword (2)","Chestplate + leggings (15)","Helmet + boots (9)"] },
-      { icon:"📖", title:"Set up enchanting", wiki:"Enchanting_Table",
-        desc:"Craft an enchanting table (<b>2 diamonds + 4 obsidian + 1 book</b>) and surround it with <b>15 bookshelves</b> (each = 6 planks + 3 books; books are easiest bought from a librarian villager) to unlock level-30 enchants. Priorities: <b>Fortune III + Efficiency IV + Unbreaking III</b> on your pickaxe, and <b>Protection IV</b> on armor. <br><br><b>Mending</b> (repairs gear from XP so it never breaks) can't come from the table — get it from villager trades, fishing, or loot chests.",
-        sub:["Craft an enchanting table","Place 15 bookshelves around it","Get Fortune III on a pickaxe","Track down Mending for your main tools"] },
       { icon:"🌀", title:"Build a Nether portal", wiki:"Nether_Portal",
-        desc:"Get obsidian (pour water onto lava, mine with a diamond pickaxe) and build a 4×5 frame. Light it with flint & steel.",
-        sub:["Gather 10+ obsidian","Build the frame","Craft flint & steel and light it"] },
+        desc:"Make obsidian: pour a water bucket over lava, then mine the black blocks with a diamond pickaxe (you need <b>10</b>). Build a 4×5 frame and light the inside with flint & steel (1 iron + 1 flint).",
+        sub:["Mine 10 obsidian","Build the 4×5 frame","Craft flint & steel and light it"] },
       { icon:"🔥", title:"Gather blaze rods", wiki:"Blaze_Rod",
-        desc:"Find a Nether Fortress, locate a blaze spawner, and kill blazes for rods. Grind rods into blaze powder for eyes of ender and potions.",
-        sub:["Find a Nether Fortress","Collect 6+ blaze rods"] },
+        desc:"Find a Nether Fortress (dark-brick structure). Blazes pour out of a caged spawner — kill them for rods (aim for <b>~7</b>). A blaze rod → 2 blaze powder, which you need for eyes of ender and potions.",
+        sub:["Find a Nether Fortress","Collect ~7 blaze rods"],
+        detour:{ tree:"gear", text:"The Nether is brutal without Fire Resistance. Consider the 'Combat potions' step in the Gearing Up tree so blazes and lava can't melt you." } },
       { icon:"👁️", title:"Craft Eyes of Ender", wiki:"Eye_of_Ender",
-        desc:"Kill Endermen in the Overworld for ender pearls, combine with blaze powder into eyes of ender. Make at least 12–15.",
-        sub:["Collect 12+ ender pearls","Craft 12+ eyes of ender"] },
+        desc:"Kill Endermen for ender pearls (they spawn at night and in the Nether's warped forest; aim for <b>~15</b>). Combine 1 pearl + 1 blaze powder = 1 eye. Make <b>~15</b> — some shatter later.",
+        sub:["Get ~15 ender pearls","Craft ~15 eyes of ender"] },
       { icon:"🏰", title:"Find the Stronghold", wiki:"Stronghold",
-        desc:"Throw an eye of ender — it floats toward the nearest stronghold. Follow the trail, dig down, and find the End Portal room." },
+        desc:"Throw an eye of ender into the air — it drifts toward the nearest stronghold, then falls (pick it back up ~80% of the time). Follow the direction, throw again as you get close, then dig down to the portal room." },
       { icon:"🌌", title:"Activate the End Portal", wiki:"End_Portal",
-        desc:"Fill each of the 12 frame blocks with an eye of ender to open the gateway to The End." },
+        desc:"In the stronghold's portal room, fill each of the 12 frame blocks with an eye of ender (a few may already be filled) to open the gateway to The End." },
       { icon:"🐉", title:"Defeat the Ender Dragon", wiki:"Ender_Dragon",
-        desc:"Shoot out the End Crystals on the obsidian pillars (bring a bow), then attack the dragon's head. Beating it 'completes' the game and opens the End gateways.",
+        desc:"Bring a bow + ~64 arrows, blocks to pillar up, food, and golden apples. First shoot out the ~10 End Crystals on the pillars (caged ones need you to climb up and break the bars), then hit the dragon's head when it perches on the portal. Beating it opens the End gateways.",
         sub:["Destroy all End Crystals","Kill the dragon","Grab the dragon egg (optional trophy)"] },
     ]
   },
@@ -307,82 +327,146 @@ const TREES = [
     id: "gear", name: "Gearing Up", emoji: "🛡️", color: "#8a8f98",
     intro: "The combat & survivability ladder — from a leather cap to a fully enchanted netherite kit that can take a hit and keep swinging.",
     steps: [
-      { icon:"🧥", title:"Leather armor", wiki:"Leather", desc:"Kill cows for leather and craft your first armor. Weak, but better than bare skin against early mobs." },
-      { icon:"🪖", title:"Full iron armor set", wiki:"Armor", desc:"Helmet, chestplate, leggings, boots — 24 iron for the full set. Your standard mid-game defense." },
-      { icon:"🛡️", title:"Craft a shield", wiki:"Shield", desc:"6 planks + 1 iron. Right-click (or hold) to block melee hits and arrows — a huge damage cut." },
-      { icon:"🏹", title:"Bow & arrows", wiki:"Bow", desc:"Bow = 3 sticks + 3 string; arrows = flint + stick + feather. Essential for ranged fights, especially the dragon.",
-        sub:["Craft a bow","Stock up on arrows"] },
-      { icon:"✨", title:"Enchant your gear", wiki:"Enchanting", desc:"Prioritise Protection on armor, Sharpness on swords, Efficiency + Unbreaking + Fortune on tools, Power/Infinity on bows.",
-        sub:["Protection on armor","Sharpness on a sword","Unbreaking on tools"] },
-      { icon:"💎", title:"Diamond armor set", wiki:"Diamond", desc:"Full diamond armor (24 diamonds). With Protection enchants this carries you through the End." },
-      { icon:"🧪", title:"Combat potions", wiki:"Potion", desc:"With a brewing stand (needs a blaze rod), brew Healing, Regeneration, Strength and Fire Resistance. Fire Res is vital in the Nether.",
-        sub:["Craft a brewing stand","Brew Fire Resistance","Brew Healing/Regen"] },
-      { icon:"🪙", title:"Netherite upgrade", wiki:"Netherite_Ingot", desc:"Mine Ancient Debris in the Nether (Y ≈ 15; blast with beds/TNT). Smelt to scrap, combine with gold → netherite ingot, then upgrade diamond gear at a smithing table.",
+      { icon:"🧥", title:"Leather armor (optional)", wiki:"Leather",
+        desc:"Cows drop 0-2 leather each; a full set is 24. Honestly you can skip straight to iron — grab a leather cap early only if mobs are hurting you." },
+      { icon:"🪖", title:"Full iron armor set", wiki:"Armor",
+        desc:"24 iron ingots for the set (helmet 5 · chest 8 · legs 7 · boots 4). Cuts incoming damage by roughly 60% — your standard mid-game defense." },
+      { icon:"🛡️", title:"Craft a shield", wiki:"Shield",
+        desc:"6 planks + 1 iron ingot. Hold use to raise it — blocks nearly all melee hits and arrows head-on. Make one before any boss fight." },
+      { icon:"🏹", title:"Bow & arrows", wiki:"Bow",
+        desc:"Bow = 3 sticks + 3 string (spiders drop string, or buy from a Librarian). Arrows = 1 flint + 1 stick + 1 feather. Keep ~64 arrows — essential for the dragon and safe mob-picking.",
+        sub:["Craft a bow","Stock ~64 arrows"] },
+      { icon:"✨", title:"Enchant your gear", wiki:"Enchanting",
+        desc:"Enchanting is big enough to have its own ladder — head there to boost every piece: Protection on armor, Sharpness on swords, Efficiency + Fortune + Unbreaking on tools.",
+        detour:{ tree:"enchant", text:"Open the Enchanting tree and work through it, then come back — your whole kit gets dramatically stronger." } },
+      { icon:"💎", title:"Diamond armor set", wiki:"Diamond",
+        desc:"Full diamond armor = 24 diamonds (5 · 8 · 7 · 4). With Protection IV on every piece this carries you through the End." },
+      { icon:"🧪", title:"Combat potions", wiki:"Potion",
+        desc:"A brewing stand needs 1 blaze rod + 3 cobble. Base every potion on an Awkward potion (water + nether wart). Key brews: <b>Fire Resistance</b> (magma cream) for the Nether, <b>Healing</b> (glistering melon), <b>Regeneration</b> (ghast tear), <b>Strength</b> (blaze powder).",
+        sub:["Craft a brewing stand","Brew Fire Resistance","Brew Healing or Regen"] },
+      { icon:"🪙", title:"Netherite upgrade", wiki:"Netherite_Ingot",
+        desc:"Mine Ancient Debris in the Nether at <b>Y ≈ 15</b> (blast tunnels with beds — beds explode in the Nether — or TNT). 4 scrap + 4 gold = 1 netherite ingot. Upgrade each diamond piece at a smithing table (needs a Netherite Upgrade template from a Bastion).",
         sub:["Find 4+ Ancient Debris","Craft a netherite ingot","Upgrade a tool or armor piece"] },
-      { icon:"🌟", title:"Totem of Undying", wiki:"Totem_of_Undying", desc:"Drops from Evokers (Woodland Mansions & raids). Held in your off-hand, it revives you from a lethal hit — the ultimate safety net." },
+      { icon:"🌟", title:"Totem of Undying", wiki:"Totem_of_Undying",
+        desc:"Drops from Evokers (in Woodland Mansions and village raids). Held in your off-hand, it revives you from a lethal hit — the ultimate safety net. Carry two." },
+    ]
+  },
+  {
+    id: "enchant", name: "Enchanting", emoji: "🔮", color: "#7a5cc9",
+    intro: "The force-multiplier behind the whole game: Fortune to triple your ore, Unbreaking + Mending so gear never breaks, Protection to survive. This is the 'detour' the Main Quest sends you on — do it as soon as you have ~8 diamonds and it pays off everywhere.",
+    steps: [
+      { icon:"📗", title:"Get your first books", wiki:"Book",
+        desc:"1 book = 3 paper + 1 leather (paper = 3 sugar cane grown by water; leather from cows). <b>Fastest route:</b> loot the bookshelves in village houses — each one you mine drops 3 books. Get ~5 books to start.",
+        sub:["Grow sugar cane → paper (or loot village shelves)","Get leather from cows","Have ~5 books"] },
+      { icon:"📖", title:"Build the enchanting table", wiki:"Enchanting_Table",
+        desc:"Recipe: <b>2 diamonds + 4 obsidian + 1 book</b>. Place it down. On its own it only gives weak, low-level enchants — the next step unlocks the good ones." },
+      { icon:"📚", title:"Ring it with 15 bookshelves", wiki:"Bookshelf",
+        desc:"Max level-30 enchants need <b>15 bookshelves</b> in a ring one block around the table. 15 shelves = 45 books + 90 planks — a big grind, so the easy way is <b>looting village/stronghold shelves</b> or a librarian (next step). Even a few shelves help in the meantime.",
+        sub:["Gather 45 books (loot or craft)","Craft 15 bookshelves","Place them around the table"] },
+      { icon:"🧑‍🌾", title:"Set up a Librarian villager", wiki:"Villager",
+        desc:"This is the meta for <b>exact</b> enchants. Place a Lectern (needs a village or your own bred villager) next to an unemployed villager to make a Librarian. Trade for emeralds, then buy enchanted books. If the offered book is bad, break and replace the lectern to reroll the trade — repeat until you get the one you want.",
+        sub:["Make a Librarian (place a lectern)","Reroll until a good enchanted book appears","Buy Mending + Fortune/Unbreaking"] },
+      { icon:"💠", title:"Enchant a Fortune III pickaxe", wiki:"Fortune",
+        desc:"Two ways: enchant at the level-30 table (random result) or apply a <b>Fortune III book on an anvil</b> (targeted — anvil = 3 iron blocks + 4 iron ingots = 31 iron). Also add <b>Efficiency IV</b> (speed) and <b>Unbreaking III</b> (durability). This is the pickaxe the Main Quest wants.",
+        sub:["Get Fortune III on a pickaxe","Add Efficiency IV + Unbreaking III"] },
+      { icon:"♻️", title:"Get Mending onto your tools", wiki:"Mending",
+        desc:"Mending repairs gear from the XP orbs you pick up, so it <b>never breaks again</b>. It only comes from villager trades, fishing, or loot chests — NOT the table. Apply a Mending book on an anvil to your main pickaxe, sword, and armor.",
+        sub:["Obtain a Mending book","Anvil it onto your pickaxe & sword"] },
+      { icon:"🛡️", title:"Enchant your armor", wiki:"Enchanting",
+        desc:"Put <b>Protection IV</b> on all four armor pieces (roughly halves damage). Great extras: <b>Feather Falling IV</b> (boots — no more fall damage), <b>Unbreaking III + Mending</b> on everything, <b>Respiration</b> (helmet, for underwater).",
+        sub:["Protection IV on all 4 pieces","Add Unbreaking III + Mending"] },
     ]
   },
   {
     id: "farm", name: "Food & Farming", emoji: "🌾", color: "#c9a227",
     intro: "Never starve again. From hunting animals to self-sustaining farms and villager trade empires.",
     steps: [
-      { icon:"🌱", title:"Plant a wheat farm", wiki:"Wheat", desc:"Hoe dirt near water, plant seeds (from breaking grass), wait until golden, harvest. Bread = 3 wheat.",
-        sub:["Till soil next to water","Plant seeds","Harvest & craft bread"] },
-      { icon:"🐄", title:"Breed animals", wiki:"Breeding", desc:"Feed two of the same animal their food (wheat for cows/sheep, seeds for chickens) to make babies — renewable meat, leather and wool.",
-        sub:["Build a pen","Breed cows or sheep","Breed chickens"] },
-      { icon:"🥕", title:"Crop variety", wiki:"Crops", desc:"Add carrots, potatoes (from villages) and beetroot. Potatoes and carrots are excellent steady food." },
-      { icon:"🐝", title:"Bees & honey", wiki:"Bee", desc:"Find a bee nest, place a campfire under it to calm the bees, then harvest honeycomb (waxes copper) and honey bottles (food + cures poison)." },
-      { icon:"💠", title:"Trade with villagers", wiki:"Trading", desc:"Find and protect a village, then trade for emeralds. Farmer, Librarian (enchanted books!) and Cleric are top priorities.",
+      { icon:"🌱", title:"Plant a wheat farm", wiki:"Wheat",
+        desc:"Hoe 9+ dirt/grass blocks within 4 blocks of water. Plant seeds (from breaking tall grass). Harvest when golden — 3 wheat = 1 bread. Replant and it becomes an endless food supply.",
+        sub:["Till soil next to water","Plant a row of seeds","Harvest & craft bread"] },
+      { icon:"🐄", title:"Breed animals", wiki:"Breeding",
+        desc:"Fence a pen. Feed two adults their food to spawn a baby: wheat for cows/sheep, seeds for chickens, carrots for pigs. Renewable meat, leather and wool.",
+        sub:["Build a fenced pen","Breed cows or sheep","Breed chickens"] },
+      { icon:"🥕", title:"Crop variety", wiki:"Crops",
+        desc:"Get carrots and potatoes from village farms (or zombie drops), beetroot seeds from village chests. Carrots and potatoes give the most hunger back per harvest — great staples." },
+      { icon:"🐝", title:"Bees & honey", wiki:"Bee",
+        desc:"Find a bee nest in flowery biomes. Put a campfire 1-2 blocks below it — the smoke calms the bees so they won't sting. Shears → honeycomb (waxes copper, makes candles); a bottle → honey (restores hunger and cures poison)." },
+      { icon:"💠", title:"Trade with villagers", wiki:"Trading",
+        desc:"Find a village and assign jobs with job-site blocks. Best partners: <b>Farmer</b> (food ↔ emeralds), <b>Librarian</b> (enchanted books & paper), <b>Cleric</b> (ender pearls, XP bottles), <b>Toolsmith/Armorer</b> (diamond gear). Trading is your most reliable emerald source.",
         sub:["Find a village","Make your first trade","Get an enchanted book from a librarian"] },
-      { icon:"🤖", title:"Automatic crop farm", wiki:"Tutorials/Crop_farming", desc:"Use water streams or villager farmers to auto-harvest crops into a hopper and chest — no more hand-farming." },
-      { icon:"🍎", title:"Enchanted golden apple", wiki:"Enchanted_Golden_Apple", desc:"8 gold blocks + 1 apple. This 'god apple' gives massive regen and resistance — a clutch item for tough fights. Keep a few." },
-      { icon:"🌋", title:"Nether wart farm", wiki:"Nether_Wart", desc:"Grab nether wart from a fortress and plant it on soul sand. It's the base ingredient for every useful potion." },
+      { icon:"🤖", title:"Automatic crop farm", wiki:"Tutorials/Crop_farming",
+        desc:"Two easy designs: a farmer villager who auto-plants and harvests into a chest, or a water-flush farm where a button releases water that sweeps crops onto a hopper line. Set it up once, harvest forever." },
+      { icon:"🍎", title:"Enchanted golden apple", wiki:"Enchanted_Golden_Apple",
+        desc:"8 gold BLOCKS (72 ingots) + 1 apple. Very expensive, but it grants Absorption + Regen + Resistance + Fire Resistance — a genuine life-saver against the dragon or Wither. Craft 1-2 and save them for emergencies." },
+      { icon:"🌋", title:"Nether wart farm", wiki:"Nether_Wart",
+        desc:"Grab nether wart from a Fortress (it grows on the stairs). Plant it on soul sand back home — it only grows there. It's the base of every useful potion, so plant a couple of rows." },
     ]
   },
   {
     id: "explore", name: "Exploration", emoji: "🧭", color: "#4fa3d1",
     intro: "The world is full of generated structures with unique loot and dangers. A checklist of places worth finding — from a sleepy village to the terrifying Ancient City.",
     steps: [
-      { icon:"🏘️", title:"Visit a Village", wiki:"Village", desc:"Free crops, beds, chests and villagers to trade with — often the best early upgrade you'll find." },
-      { icon:"🏜️", title:"Raid a Desert Pyramid", wiki:"Desert_Pyramid", desc:"Loot chests sit above a pressure-plate TNT trap — break in from the side or disarm it first. Good early loot." },
-      { icon:"⚓", title:"Ocean: shipwreck & treasure", wiki:"Shipwreck", desc:"Shipwrecks hold treasure maps leading to buried treasure — often a Heart of the Sea for a conduit.",
-        sub:["Find a shipwreck","Follow a treasure map","Dig up buried treasure"] },
-      { icon:"🌊", title:"Ocean Monument", wiki:"Ocean_Monument", desc:"Guardian-infested underwater temple with sponges, gold blocks and Elder Guardians. Bring water breathing + night vision." },
-      { icon:"🏚️", title:"Woodland Mansion", wiki:"Woodland_Mansion", desc:"A huge, rare forest mansion full of Illagers — including Evokers that drop the Totem of Undying. A Cartographer's map points the way." },
-      { icon:"⚔️", title:"Survive a Raid", wiki:"Raid", desc:"Kill a Pillager captain for 'Bad Omen', then enter a village to trigger a raid. Win every wave for the 'Hero of the Village' discount buff." },
-      { icon:"🗿", title:"Ancient City (Deep Dark)", wiki:"Ancient_City", desc:"A deep underground biome with incredible loot — but home to the Warden, a blind one-shot monster that senses vibration. Sneak; don't fight.",
+      { icon:"🏘️", title:"Visit a Village", wiki:"Village",
+        desc:"Common in plains, desert, savanna and taiga. Free beds, crops, hay bales (= 9 wheat each) and villagers to trade with. Light it up and wall any gaps so zombies don't kill the villagers at night." },
+      { icon:"🏜️", title:"Raid a Desert Pyramid", wiki:"Desert_Pyramid",
+        desc:"Sandstone structure in deserts. The center has a hidden 9-block drop onto a pressure plate wired to TNT — break the blue terracotta or dig in from the side to reach the 4 loot chests safely." },
+      { icon:"⚓", title:"Ocean: shipwreck & treasure", wiki:"Shipwreck",
+        desc:"Shipwrecks hold a buried-treasure map. Follow it to the X and dig ~5 blocks down for a chest — often a Heart of the Sea (for a conduit) plus gold and emeralds.",
+        sub:["Find a shipwreck","Follow the treasure map","Dig up the buried treasure"] },
+      { icon:"🌊", title:"Ocean Monument", wiki:"Ocean_Monument",
+        desc:"Big underwater temple guarded by Guardians and 3 Elder Guardians (they give Mining Fatigue). Bring a Respiration helmet plus Night Vision + Water Breathing potions. Loot: 8 gold blocks and sponges." },
+      { icon:"🏚️", title:"Woodland Mansion", wiki:"Woodland_Mansion",
+        desc:"Very rare, deep in dark forests. Buy a Woodland Explorer Map from a Cartographer villager to locate one. Packed with Evokers (drop the Totem of Undying) and Vindicators — go in with enchanted diamond+ gear." },
+      { icon:"⚔️", title:"Survive a Raid", wiki:"Raid",
+        desc:"Kill a Pillager Captain (patrols and outposts) to get the 'Bad Omen' effect, then enter a village to trigger a raid — 5-7 waves of Illagers. Win them all for 'Hero of the Village' (big trading discounts)." },
+      { icon:"🗿", title:"Ancient City (Deep Dark)", wiki:"Ancient_City",
+        desc:"In the Deep Dark biome, below Y ≈ -52. Incredible loot (Swift Sneak, enchanted books, disc fragments) but home to the Warden — it's blind, one-shots you, and hunts noise/sculk sensors. Sneak everywhere, place wool to muffle, and do NOT fight it.",
         sub:["Find a Deep Dark biome","Loot an Ancient City chest","Escape without waking the Warden"] },
-      { icon:"🏺", title:"Archaeology / Trail Ruins", wiki:"Trail_Ruins", desc:"Brush suspicious sand and gravel to excavate pottery sherds and rare templates — a quieter collector's side-goal." },
+      { icon:"🏺", title:"Archaeology / Trail Ruins", wiki:"Trail_Ruins",
+        desc:"Craft a brush (feather + copper ingot + stick). Brush suspicious gravel and sand at Trail Ruins, desert wells and ocean ruins to excavate pottery sherds and rare armor trims — a quiet collector's side-goal." },
     ]
   },
   {
     id: "redstone", name: "Redstone & Building", emoji: "🔴", color: "#b0413e",
     intro: "The engineering ladder. Redstone is Minecraft's wiring — from a simple lever up to farms that run themselves while you're away.",
     steps: [
-      { icon:"🔴", title:"Learn redstone basics", wiki:"Redstone_Dust", desc:"Mine redstone ore, lay dust as 'wire', and power it with a lever, button or redstone torch. Everything else builds on this." },
-      { icon:"🚪", title:"Doors, pistons & dispensers", wiki:"Piston", desc:"Wire a lever to a piston or iron door. Pistons push blocks; dispensers shoot items — the building blocks of every contraption.",
+      { icon:"🔴", title:"Learn redstone basics", wiki:"Redstone_Dust",
+        desc:"Mine redstone ore (deep, like diamonds — drops 4-5 dust). Lay dust as 'wire' and power it with a lever (on/off), button (short pulse) or redstone torch (always on). A signal travels 15 blocks before it needs a repeater to boost it." },
+      { icon:"🚪", title:"Doors, pistons & dispensers", wiki:"Piston",
+        desc:"Piston = 3 planks + 4 cobble + 1 iron + 1 redstone (add a slimeball for a sticky one). Dispenser = 7 cobble + 1 bow + 1 redstone. Wire a lever to a piston to build a hidden door.",
         sub:["Build a piston door","Set up a dispenser"] },
-      { icon:"⚙️", title:"Auto-smelter", wiki:"Hopper", desc:"Use hoppers to feed ore + fuel into a furnace and pull ingots out automatically — set-and-forget smelting." },
-      { icon:"💀", title:"Build a mob / XP farm", wiki:"Tutorials/Mob_farm", desc:"A dark chamber where mobs spawn, get funneled by water, and drop to a killing spot — endless XP plus string, bones and gunpowder.",
-        sub:["Build a spawn chamber","Funnel mobs to one spot","Collect XP and drops"] },
-      { icon:"🧲", title:"Item sorting system", wiki:"Hopper", desc:"Hopper-based sorters route each item type into its own labelled chest automatically — tames late-game inventory chaos." },
-      { icon:"🔩", title:"Iron golem farm", wiki:"Iron_Golem", desc:"Use villagers and a spawn platform to farm iron golems for renewable iron — no more mining it by hand." },
-      { icon:"💡", title:"Build something beautiful", wiki:"Tutorials/Building_a_house", desc:"Not everything is function. Design a base you actually want to live in — mix wood, stone, glass and lighting for atmosphere." },
+      { icon:"⚙️", title:"Auto-smelter", wiki:"Hopper",
+        desc:"A hopper (5 iron + 1 chest) feeds ore into the furnace top and fuel into its side; a hopper underneath pulls finished ingots into a chest. Load it and walk away." },
+      { icon:"💀", title:"Build a mob / XP farm", wiki:"Tutorials/Mob_farm",
+        desc:"Build a dark 9×9 platform 24+ blocks up (or cap a cave), use water to flush mobs into a 1-wide drop of ~22 blocks so they land nearly dead, then finish them for full XP + drops. Sleep through the night so only your farm spawns mobs.",
+        sub:["Build a spawn platform","Funnel mobs down a drop","Collect XP and drops"] },
+      { icon:"🧲", title:"Item sorting system", wiki:"Hopper",
+        desc:"A row of hoppers over labelled chests, each 'filtered' to one item type, routes every drop into its own chest automatically. Tames late-game storage chaos — pair it with your mob farm." },
+      { icon:"🔩", title:"Iron golem farm", wiki:"Iron_Golem",
+        desc:"Pen 3+ villagers on a platform; when they get 'scared' by a zombie nearby they spawn iron golems, which drop into a killing chamber. Produces dozens of iron per hour — replaces iron mining entirely." },
+      { icon:"💡", title:"Build something beautiful", wiki:"Tutorials/Building_a_house",
+        desc:"Not everything is function. Design a base you actually want to live in — mix wood, stone, glass and layered lighting, and vary block textures so walls don't look flat." },
     ]
   },
   {
     id: "nether", name: "The Nether", emoji: "🔥", color: "#d1603a",
     intro: "A deeper dive into the hell dimension beyond the Main Quest's blaze rods — biomes, bartering, and the road to a Beacon.",
     steps: [
-      { icon:"🌀", title:"Enter the Nether", wiki:"The_Nether", desc:"Step through a lit portal. Bring fire resistance, a bow, blocks to bridge, and don't wear gold near angry piglins… unless you want to trade." },
-      { icon:"🐷", title:"Barter with Piglins", wiki:"Piglin", desc:"Wear at least one gold armor piece, then drop or trade gold ingots. Piglins toss back random loot — ender pearls, obsidian, fire res potions.",
-        sub:["Wear a gold item","Trade 10+ gold ingots"] },
-      { icon:"🗺️", title:"Visit every Nether biome", wiki:"Biome", desc:"Crimson forest, warped forest, soul sand valley, basalt deltas and the nether wastes each have unique blocks and mobs.",
+      { icon:"🌀", title:"Enter the Nether", wiki:"The_Nether",
+        desc:"Pack: Fire Resistance potions (or a golden apple), a bow, ~1 stack of blocks to bridge over lava, food, and an iron+ pickaxe. Note your portal's coordinates so you can find it again. Don't wear gold near piglins unless you mean to barter." },
+      { icon:"🐷", title:"Barter with Piglins", wiki:"Piglin",
+        desc:"Wear at least one gold armor piece so adult piglins stay neutral. Give them gold ingots (right-click or drop) — each returns random loot: ender pearls, obsidian, string, Fire Res potions, Soul Speed books. Trade ~1 stack of gold.",
+        sub:["Wear a gold item","Trade ~1 stack of gold ingots"] },
+      { icon:"🗺️", title:"Visit every Nether biome", wiki:"Biome",
+        desc:"Each has unique blocks and mobs: crimson forest (hoglins, huge red fungi), warped forest (endermen — safe from hoglins), soul sand valley (skeletons, soul soil), basalt deltas (magma cubes), nether wastes (ghasts, piglins).",
         sub:["Crimson or warped forest","Soul sand valley","Basalt deltas"] },
-      { icon:"💀", title:"Farm Wither Skeleton skulls", wiki:"Wither_Skeleton", desc:"Wither skeletons spawn in fortresses. You need 3 of their (rare) skulls to summon the Wither boss.",
-        sub:["Kill wither skeletons","Collect 3 skulls"] },
-      { icon:"☠️", title:"Summon & defeat the Wither", wiki:"Wither", desc:"Build a T of 4 soul sand + 3 skulls to spawn the Wither — a dangerous flying boss. Fight it enclosed. It drops a Nether Star." },
-      { icon:"🔆", title:"Build a Beacon", wiki:"Beacon", desc:"Nether Star + glass + obsidian = a beacon. Place it on a pyramid of iron/gold/diamond/netherite blocks for permanent buffs (Haste, Speed…).",
+      { icon:"💀", title:"Farm Wither Skeleton skulls", wiki:"Wither_Skeleton",
+        desc:"Wither skeletons spawn in Nether Fortresses. The skull drop is only ~2.5%, so use a <b>Looting III</b> sword and be patient — you need <b>3 skulls</b> to summon the Wither.",
+        sub:["Kill wither skeletons (Looting helps)","Collect 3 skulls"] },
+      { icon:"☠️", title:"Summon & defeat the Wither", wiki:"Wither",
+        desc:"Place 4 soul sand in a T-shape, then 3 wither skulls on top. It explodes when it spawns, so trap it in an obsidian box or fight on the bedrock roof. Bring Smite V, golden apples and Healing potions. Drops 1 Nether Star." },
+      { icon:"🔆", title:"Build a Beacon", wiki:"Beacon",
+        desc:"Nether Star + 3 glass + 5 obsidian = a beacon. Place it atop a pyramid of iron/gold/diamond/emerald/netherite blocks: 1 layer (9 blocks) gives one short-range effect; a full 4-layer pyramid (164 blocks) gives max range and two effects like permanent Haste + Speed.",
         sub:["Craft a beacon","Build the mineral pyramid","Activate a buff"] },
     ]
   },
@@ -390,17 +474,24 @@ const TREES = [
     id: "end", name: "Endgame & Beyond", emoji: "🌌", color: "#a988d6",
     intro: "'Beating the dragon' is really the start of the endgame. The outer End islands hold Elytra wings and the game's best loot.",
     steps: [
-      { icon:"🐉", title:"Defeat the Ender Dragon", wiki:"Ender_Dragon", desc:"The literal gateway to everything here. Once it's dead, an End Gateway portal appears leading to the outer islands." },
-      { icon:"🌉", title:"Reach the outer End islands", wiki:"End_Gateway", desc:"Throw an ender pearl through the small End Gateway to teleport out to where End Cities generate.",
+      { icon:"🐉", title:"Defeat the Ender Dragon", wiki:"Ender_Dragon",
+        desc:"The literal gateway to everything here (see the Main Quest for the full fight). Once it's dead, small End Gateway portals appear near the center." },
+      { icon:"🌉", title:"Reach the outer End islands", wiki:"End_Gateway",
+        desc:"Throw an ender pearl into a small End Gateway portal to teleport ~1000 blocks out to the outer islands, where End Cities generate. Build a safe landing or bring blocks — it's a long drop.",
         sub:["Find an End Gateway","Pearl through to the outer islands"] },
-      { icon:"🏙️", title:"Loot an End City", wiki:"End_City", desc:"Tall purpur towers guarded by Shulkers (which levitate you — mind the ledges). Chests hold diamond/enchanted gear and iron.",
+      { icon:"🏙️", title:"Loot an End City", wiki:"End_City",
+        desc:"Tall purpur towers on the outer islands. Guarded by Shulkers that shoot levitation bullets — carry Slow Falling potions and mind the void. Chests hold diamond/enchanted gear, iron and gold blocks.",
         sub:["Find an End City","Defeat the Shulkers","Loot the chests"] },
-      { icon:"🪽", title:"Get the Elytra", wiki:"Elytra", desc:"Found on the End Ship by some End Cities, in an item frame near the bow. These wings let you glide — game-changing mobility.",
-        sub:["Find an End Ship","Grab the Elytra","Boost with fireworks"] },
-      { icon:"📦", title:"Craft Shulker Boxes", wiki:"Shulker_Box", desc:"Kill Shulkers for shells; 2 shells + a chest = a portable chest that keeps its contents when broken. Endgame storage upgrade.",
+      { icon:"🪽", title:"Get the Elytra", wiki:"Elytra",
+        desc:"On the End Ship (a floating galleon by some cities), in an item frame on the deck. These wings let you glide — game-changing mobility. Grab the Dragon Head off the bow too. Boost your flight with firework rockets; repair with Mending or phantom membrane.",
+        sub:["Find an End Ship","Grab the Elytra","Fly with firework boosts"] },
+      { icon:"📦", title:"Craft Shulker Boxes", wiki:"Shulker_Box",
+        desc:"Shulkers drop shells ~50% of the time (Looting helps). 2 shells + 1 chest = a shulker box that keeps its contents when broken — portable storage. Farm enough shells for a stack of boxes.",
         sub:["Collect 2 shulker shells","Craft a shulker box"] },
-      { icon:"🥚", title:"Respawn the dragon (optional)", wiki:"End_Crystal", desc:"Place 4 End Crystals around the exit portal to resummon the dragon for repeat fights, more dragon breath and XP." },
-      { icon:"🏆", title:"Complete the collection", wiki:"Advancements", desc:"Chase the full advancement tree — 'How Did We Get Here?' (every effect at once) and 'A Complete Catalogue' (all cats) are the ultimate flexes." },
+      { icon:"🥚", title:"Respawn the dragon (optional)", wiki:"End_Crystal",
+        desc:"An End Crystal = 7 glass + 1 eye of ender + 1 ghast tear. Place 4 of them on the edges of the exit portal to resummon the dragon for repeat fights, XP and dragon's breath (for lingering potions)." },
+      { icon:"🏆", title:"Complete the collection", wiki:"Advancements",
+        desc:"Chase the full advancement tree — 'How Did We Get Here?' (every status effect at once) and 'A Complete Catalogue' (befriend all cat variants) are the ultimate flexes." },
     ]
   },
 ];
@@ -408,6 +499,7 @@ const TREES = [
 const STORAGE_KEY = "minecraft-ladder-v1";
 let state = loadState();
 let activeTree = TREES[0].id;
+const treeName = id => { const t = TREES.find(x => x.id === id); return t ? t.name : id; };
 
 function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -468,6 +560,8 @@ function renderTree() {
       }).join("") + '</div>';
     }
     const link = s.wiki ? `<div class="step-links"><a href="${WIKI(s.wiki)}" target="_blank" rel="noopener">📖 Wiki reference →</a></div>` : "";
+    const dt = s.detour;
+    const detourHTML = dt ? `<div class="detour"><span class="detour-txt">🔀 <b>Detour:</b> ${dt.text}</span><button class="detour-btn" data-jump="${dt.tree}">Go to ${treeName(dt.tree)} →</button></div>` : "";
 
     step.innerHTML = `
       <div class="step-head">
@@ -477,7 +571,7 @@ function renderTree() {
           <p class="step-desc">${s.desc}</p>
           ${link}
         </div>
-      </div>${subHTML}`;
+      </div>${subHTML}${detourHTML}`;
     ladder.appendChild(step);
   });
 
@@ -486,6 +580,9 @@ function renderTree() {
   });
   ladder.querySelectorAll(".sub-check").forEach(cb => {
     cb.onchange = () => { state[keySub(tree.id, +cb.dataset.si, +cb.dataset.sj)] = cb.checked; saveState(); renderAll(); };
+  });
+  ladder.querySelectorAll(".detour-btn").forEach(b => {
+    b.onclick = () => { activeTree = b.dataset.jump; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); };
   });
 
   const { total, done } = treeTotals(tree);
