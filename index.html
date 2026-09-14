@@ -725,6 +725,12 @@ document.getElementById("reset-btn").onclick = () => {
 
 renderAll();
 </script>
+<script type="module">
+  // ⌘S / Ctrl+S: every tick already saves itself, so say so instead of letting
+  // the browser offer to save the page.
+  import { interceptSave } from "https://cdn.jsdelivr.net/gh/mred-randomprojects/cmd-s@1.0.0/dist/cmd-s.js";
+  interceptSave({ onSave: () => "Saved" });
+</script>
 
 </body>
 </html>
