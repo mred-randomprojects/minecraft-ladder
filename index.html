@@ -649,21 +649,33 @@ function readSaved() {
   } catch (e) { return null; }
 }
 
-// A tick starts from what storage holds now, not from this page's copy, so a
-// tick made in another tab (or the installed app) since it loaded is kept.
-// With nothing readable in storage, this page's copy is all there is: keep it.
+// Ticks made here that storage refused (full quota, blocked site data). They
+// stay on screen and are written again with the next tick or ⌘S.
+let unsaved = {};
+
+// Writes this page's ticks on top of what storage holds now, not on top of the
+// copy this page loaded, so a tick made in another tab (or the installed app)
+// since then is kept. With nothing readable in storage, this page's copy is
+// all there is: keep it. True when every tick reached storage.
+function saveTicks() {
+  state = Object.assign(readSaved() || state, unsaved);
+  if (!saveState()) return false;
+  unsaved = {};
+  return true;
+}
+
 function setTick(key, done) {
-  state = readSaved() || state;
-  state[key] = done;
-  saveState();
+  unsaved[key] = done;
+  saveTicks();
   renderAll();
 }
 
-// Another tab changed the ticks: show them here too.
+// Another tab changed the ticks: show them here too, with this page's
+// unsaved ticks still on top.
 window.addEventListener("storage", e => {
   if (e.key !== STORAGE_KEY) return;
   const saved = readSaved();
-  if (saved) { state = saved; renderAll(); }
+  if (saved) { state = Object.assign(saved, unsaved); renderAll(); }
 });
 
 function treeTotals(tree) {
@@ -779,17 +791,22 @@ function renderAll() {
 
 document.getElementById("reset-btn").onclick = () => {
   if (confirm("Reset ALL progress across every tree? This can't be undone.")) {
-    state = {}; saveState(); renderAll();
+    unsaved = {}; state = {}; saveState(); renderAll();
   }
 };
 
 renderAll();
 </script>
 <script type="module">
-  // ⌘S / Ctrl+S: every tick already saves itself, so save again and say how it
-  // went instead of letting the browser offer to save the page.
+  // ⌘S / Ctrl+S: every tick already saves itself, so save again (on top of
+  // what storage holds, like a tick) and say how it went instead of letting
+  // the browser offer to save the page.
   import { interceptSave } from "https://cdn.jsdelivr.net/gh/mred-randomprojects/cmd-s@1.0.0/dist/cmd-s.js";
-  interceptSave({ onSave: () => saveState() ? "Saved" : "Not saved: browser storage is full or blocked" });
+  interceptSave({ onSave: () => {
+    const saved = saveTicks();
+    renderAll();
+    return saved ? "Saved" : "Not saved: browser storage is full or blocked";
+  } });
 </script>
 
 </body>
