@@ -1,6 +1,8 @@
-// Checks index.html before it deploys: both inline scripts parse, and the
-// TREES data is well formed (unique tree ids, every Detour points at a tree
-// that exists, every step has its required fields and no misspelled ones).
+// Checks index.html before it deploys: the inline scripts parse, every module
+// imported from another server is pinned by an integrity hash in the import
+// map, and the TREES data is well formed (unique tree ids, every Detour points
+// at a tree that exists, every step has its required fields and no misspelled
+// ones).
 // No dependencies: `node scripts/check.mjs [path/to/index.html]`.
 
 import { spawnSync } from "node:child_process";
@@ -24,6 +26,7 @@ const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].ma
 }));
 
 let classic = null;
+let importMap = null;
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "minecraft-ladder-check-"));
 try {
   for (const s of scripts) {
@@ -41,12 +44,35 @@ try {
       fs.writeFileSync(out, "\n".repeat(s.line - 1) + s.src);
       const r = spawnSync(process.execPath, ["--check", out], { encoding: "utf8" });
       if (r.status !== 0) problems.push(`${where} does not parse:\n${r.stderr.trim()}`);
+    } else if (s.type === "importmap") {
+      try {
+        importMap = { line: s.line, ...JSON.parse(s.src) };
+      } catch (e) {
+        problems.push(`${where} is not valid JSON: ${e.message}`);
+      }
     } else {
       problems.push(`${where}: unexpected script type; teach scripts/check.mjs about it`);
     }
   }
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true });
+}
+
+// --- Outside modules are pinned ------------------------------------------------
+
+// A module from a CDN runs on the origin every mred-randomprojects app shares,
+// so each one needs a hash in the import map, which must come before any
+// module script (a later one is ignored).
+const modules = scripts.filter((s) => s.type === "module");
+for (const s of modules) {
+  for (const [, url] of s.src.matchAll(/(?:\bfrom|\bimport)\s*\(?\s*["'](https?:\/\/[^"']+)["']/g)) {
+    const hash = importMap?.integrity?.[url];
+    if (!hash) problems.push(`${url} is imported without an integrity hash in the <script type="importmap">`);
+    else if (!/^sha(256|384|512)-[A-Za-z0-9+/]+={0,2}$/.test(hash)) problems.push(`Malformed integrity for ${url}: ${hash}`);
+  }
+}
+if (importMap && modules.some((s) => s.line < importMap.line)) {
+  problems.push(`The <script type="importmap"> (line ${importMap.line}) must come before every <script type="module">`);
 }
 
 // --- TREES -----------------------------------------------------------------
@@ -139,6 +165,6 @@ const steps = TREES.flatMap((t) => t.steps);
 const subs = steps.reduce((n, s) => n + (s.sub?.length ?? 0), 0);
 const detours = steps.filter((s) => s.detour).length;
 console.log(
-  `ok: ${scripts.length} inline scripts parse; ${TREES.length} trees, ${steps.length} steps, ` +
+  `ok: ${scripts.length} inline scripts parse, outside modules pinned; ${TREES.length} trees, ${steps.length} steps, ` +
     `${subs} subtasks, ${detours} detours`,
 );

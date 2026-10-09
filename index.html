@@ -236,6 +236,17 @@
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<!-- cmd-s comes from jsDelivr and runs on the origin every mred-randomprojects
+     app shares, so the browser refuses it unless its bytes match this hash.
+     Moving to another version means a new URL here and below, and its hash:
+     curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A -->
+<script type="importmap">
+{
+  "integrity": {
+    "https://cdn.jsdelivr.net/gh/mred-randomprojects/cmd-s@1.0.0/dist/cmd-s.js": "sha384-PFN7FojT4754YsJFOeWsOSVw3uxilW0wmkUVMnae3Xfny7DPcGRZ/Z3fmm4LNfM5"
+  }
+}
+</script>
 </head>
 <body>
 
