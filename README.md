@@ -4,7 +4,7 @@ A step-by-step Minecraft progression guide, built as a "ladder" you climb rung b
 
 ## How it's built
 
-A single self-contained `index.html` — all CSS and JS are inline, no build step, no dependencies. Progress is stored in `localStorage` (no account needed, private to each device). The page is theme-aware (light/dark) and installable as a PWA via `manifest.webmanifest`.
+A single self-contained `index.html` — all CSS and JS are inline, no build step, no dependencies. Progress is stored in `localStorage` (no account needed, private to each device). The page is theme-aware (light/dark) and installable as a PWA via `manifest.webmanifest`. The PNG icons (`apple-touch-icon.png` at 180 px for iOS, `icon-192.png`, `icon-512.png`) are rasterized from `icon.svg`; when it changes, regenerate them with `sips -s format png -z 180 180 icon.svg --out apple-touch-icon.png` (and the same with 192 and 512).
 
 ## Deployment
 
