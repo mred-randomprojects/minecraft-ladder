@@ -669,6 +669,8 @@ function renderTabs() {
     const { total, done } = treeTotals(tree);
     const t = document.createElement("button");
     t.className = "tab" + (tree.id === activeTree ? " active" : "");
+    t.dataset.tree = tree.id;
+    t.setAttribute("aria-pressed", String(tree.id === activeTree));
     t.style.setProperty("--tab-accent", tree.color);
     t.innerHTML = `<span class="emoji">${tree.emoji}</span> ${tree.name} <span class="mini">${done}/${total}</span>`;
     t.onclick = () => { activeTree = tree.id; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); };
@@ -743,7 +745,24 @@ function renderOverall() {
   document.getElementById("overall-bar").style.width = (total ? done / total * 100 : 0) + "%";
 }
 
-function renderAll() { renderTabs(); renderTree(); renderOverall(); }
+// Rendering replaces every control, which would drop keyboard focus onto the
+// page. Name the focused control, render, then focus its replacement; for a
+// Detour button that is the tab of the tree it led to.
+function controlKey(el) {
+  if (el.classList.contains("step-check")) return "step " + el.dataset.si;
+  if (el.classList.contains("sub-check")) return "sub " + el.dataset.si + " " + el.dataset.sj;
+  if (el.classList.contains("tab")) return "tab " + el.dataset.tree;
+  if (el.classList.contains("detour-btn")) return "tab " + el.dataset.jump;
+  return null;
+}
+
+function renderAll() {
+  const focused = document.activeElement ? controlKey(document.activeElement) : null;
+  renderTabs(); renderTree(); renderOverall();
+  if (!focused) return;
+  const next = [...document.querySelectorAll(".step-check, .sub-check, .tab")].find(el => controlKey(el) === focused);
+  if (next) next.focus({ preventScroll: true });
+}
 
 document.getElementById("reset-btn").onclick = () => {
   if (confirm("Reset ALL progress across every tree? This can't be undone.")) {
