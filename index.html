@@ -628,6 +628,31 @@ function saveState() {
 const keyStep = (tid, i) => tid + ":s" + i;
 const keySub = (tid, i, j) => tid + ":s" + i + ":sub" + j;
 
+// The ticks storage holds right now, or null when there is nothing readable.
+function readSaved() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : null;
+  } catch (e) { return null; }
+}
+
+// A tick starts from what storage holds now, not from this page's copy, so a
+// tick made in another tab (or the installed app) since it loaded is kept.
+// With nothing readable in storage, this page's copy is all there is: keep it.
+function setTick(key, done) {
+  state = readSaved() || state;
+  state[key] = done;
+  saveState();
+  renderAll();
+}
+
+// Another tab changed the ticks: show them here too.
+window.addEventListener("storage", e => {
+  if (e.key !== STORAGE_KEY) return;
+  const saved = readSaved();
+  if (saved) { state = saved; renderAll(); }
+});
+
 function treeTotals(tree) {
   let total = 0, done = 0;
   tree.steps.forEach((s, i) => {
@@ -695,10 +720,10 @@ function renderTree() {
   });
 
   ladder.querySelectorAll(".step-check").forEach(cb => {
-    cb.onchange = () => { state[keyStep(tree.id, +cb.dataset.si)] = cb.checked; saveState(); renderAll(); };
+    cb.onchange = () => setTick(keyStep(tree.id, +cb.dataset.si), cb.checked);
   });
   ladder.querySelectorAll(".sub-check").forEach(cb => {
-    cb.onchange = () => { state[keySub(tree.id, +cb.dataset.si, +cb.dataset.sj)] = cb.checked; saveState(); renderAll(); };
+    cb.onchange = () => setTick(keySub(tree.id, +cb.dataset.si, +cb.dataset.sj), cb.checked);
   });
   ladder.querySelectorAll(".detour-btn").forEach(b => {
     b.onclick = () => { activeTree = b.dataset.jump; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); };
