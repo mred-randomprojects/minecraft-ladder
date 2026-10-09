@@ -8,11 +8,11 @@ A single self-contained `index.html` — all CSS and JS are inline, no build ste
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which publishes the site to GitHub Pages automatically. No local build.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs `node scripts/check.mjs`, stamps `version.json` with the commit, and publishes the site to GitHub Pages. No local build. The check (no dependencies) makes sure the inline scripts parse and that `TREES` is well formed: unique tree ids, every Detour pointing at a tree that exists, every step with its icon, title, description and wiki link, and no misspelled fields. A failed check leaves the previous deploy live.
 
 ## Editing
 
-Open `index.html` and edit directly. Every tree, step, explanation, and subtask lives in the `TREES` array inside the `<script>` block — add a step or a whole new tree there and it renders automatically.
+Open `index.html` and edit directly. Every tree, step, explanation, and subtask lives in the `TREES` array inside the `<script>` block — add a step or a whole new tree there and it renders automatically. Run `node scripts/check.mjs` before pushing.
 
 ## Notes
 
