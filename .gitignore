@@ -1,1 +1,8 @@
 .DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+*.local
+*service-account*.json
+.claude/settings.local.json
