@@ -619,8 +619,11 @@ function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch (e) { return {}; }
 }
+// True when the ticks reached storage. It fails when site data is blocked, or
+// when the ~5 MB this whole origin shares (every mred-randomprojects app) is full.
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
+  catch (e) { console.error("[minecraft-ladder] Could not save progress:", e); return false; }
 }
 const keyStep = (tid, i) => tid + ":s" + i;
 const keySub = (tid, i, j) => tid + ":s" + i + ":sub" + j;
@@ -726,10 +729,10 @@ document.getElementById("reset-btn").onclick = () => {
 renderAll();
 </script>
 <script type="module">
-  // ⌘S / Ctrl+S: every tick already saves itself, so say so instead of letting
-  // the browser offer to save the page.
+  // ⌘S / Ctrl+S: every tick already saves itself, so save again and say how it
+  // went instead of letting the browser offer to save the page.
   import { interceptSave } from "https://cdn.jsdelivr.net/gh/mred-randomprojects/cmd-s@1.0.0/dist/cmd-s.js";
-  interceptSave({ onSave: () => "Saved" });
+  interceptSave({ onSave: () => saveState() ? "Saved" : "Not saved: browser storage is full or blocked" });
 </script>
 
 </body>
